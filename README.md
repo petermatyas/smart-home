@@ -3,7 +3,7 @@
 weather station with arduino micro
 
 
-Irrigation and wearter indoor station
+<b>Irrigation and wearter indoor station</b>
 
 
 
