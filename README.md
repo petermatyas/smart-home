@@ -30,3 +30,12 @@ TX (1)  RS485 converter         DI
 A0                              voltage measurement 
 A1                              current measurement //not used
 A2                              photoseristor
+
+
+<b>Communication cable</b>
+communication:  RS485
+cable type:     alarm cable 4x0.22 shielded
+hearts: red     VCC
+        whit:   GND
+        yellow: RS485 A
+        green:  RS485 B
