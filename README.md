@@ -33,9 +33,10 @@ A2                              photoseristor
 
 
 <b>Communication cable</b>
-communication:  RS485
-cable type:     alarm cable 4x0.22 shielded
-hearts: red     VCC
-        whit:   GND
-        yellow: RS485 A
-        green:  RS485 B
+<br>communication bus:  RS485
+<br>cable type:         alarm cable 4x0.22 shielded
+<br>hearts: 
+<br>    red:    VCC
+<br>    white:  GND
+<br>    yellow: RS485 A
+<br>    green:  RS485 B
