@@ -10,7 +10,7 @@ Irrigation and wearter indoor station
 
 
 
-Outdoor weather station
+<b>Outdoor weather station</b>
 
 
 Arduino micro pin configuration:
