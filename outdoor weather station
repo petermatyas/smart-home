@@ -1,0 +1,117 @@
+//outdoor weather station
+
+#include "DHT.h"   // Adafruit library https://github.com/adafruit/DHT-sensor-library  version 1.2.3
+#include <Wire.h>
+#include <Adafruit_BMP085.h>  // Adafruit library https://github.com/adafruit/Adafruit-BMP085-Library   version 1.0.0
+Adafruit_BMP085 bmp;
+
+
+
+#define DHTTYPE DHT22
+
+
+
+// --- board settings ---
+
+#define ver "1.0.0"    // firmware version
+#define addr 2         // board address
+
+// --- port settings ---
+#define DHTPIN    5       //DHT22 
+int voltagePin =  A0;     //input voltage 
+int current =     A1;     //still not used
+int lightPin =    A2;     
+
+
+
+
+
+DHT dht(DHTPIN, DHTTYPE); 
+
+// --- setup ---
+void setup() {
+  //humiditySerial.begin(9600);
+  Serial1.begin(9600);
+  dht.begin();
+  bmp.begin();
+
+}
+
+
+// --- functions ---
+int Light() {
+  return(analogRead(lightPin));
+}
+
+
+float Temperature() {
+  delay(2000);
+  for (int i = 0; i<3;i++) {
+    float t = dht.readTemperature();      
+    if (isnan(t)) {
+      delay(2000);    
+    }
+    else {
+      return(t);
+      break;
+    }
+  } 
+  return('err');
+}
+
+
+float Humidity() {
+  delay(3000);
+  for (int i = 0; i<3;i++) {
+    float h = dht.readHumidity();      
+    if (isnan(h)) {
+      delay(2000);    
+    }
+    else {
+      return(h);
+      break;
+    }
+  } 
+  return('err');  
+}
+
+int Pressure() {
+  return(bmp.readPressure());
+}
+
+int Voltage() {
+  return(analogRead(voltagePin));
+}
+
+
+
+//----------main loop------------//
+
+void loop() {
+
+  if(Serial1.available()){
+    String command = Serial1.readStringUntil('\n');
+
+    if(command=="temp") {
+      Serial1.println(Temperature());     
+    } 
+    else if(command=="hum") {
+      Serial1.println(Humidity());          
+    }
+    else if(command=="light") {
+      Serial1.println(Light());
+    }
+    else if (command=="pres") {
+      Serial1.println(Pressure());
+    }
+    else if (command=="volt") {
+      Serial1.println(Voltage());
+    }
+
+
+
+    command = "";    
+  }
+
+
+}
