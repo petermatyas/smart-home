@@ -13,7 +13,7 @@ Adafruit_BMP085 bmp;
 
 // --- board settings ---
 
-#define ver  "1.0.1"   // firmware version
+#define ver  "1.0.2"   // firmware version
 #define addr "2"       // board address
 
 // --- port settings ---
@@ -69,8 +69,8 @@ float Humidity() {
   return('err');  
 }
 
-int Pressure() {
-  return(bmp.readPressure());
+long Pressure() {
+  return(bmp.readSealevelPressure());
 }
 
 int Voltage() {
