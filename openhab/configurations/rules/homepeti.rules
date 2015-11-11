@@ -1,0 +1,36 @@
+import java.lang.Double
+import java.lang.String
+
+
+rule "command parser"
+when
+        Item    SerialText received update
+then
+        var String lineBuffer = SerialText.state.toString.split("\n")
+        for (String line : lineBuffer)
+                {
+                var String[] message = line.split(":")
+                var String addr = message.get(0)
+                var String value = message.get(1)
+                var Double  value2 = new Double(value)
+                postUpdate(SmallRoomTemp, value2)
+
+                }
+end
+
+
+rule "query"
+when
+        Time cron "* */10 * * * ?"
+then
+        sendCommand(SerialText, "temp")
+end
+
+
+rule "turn led on"
+when
+        Item led changed to ON
+then
+        sendCommand(SerialText, "ledon")
+end
+
