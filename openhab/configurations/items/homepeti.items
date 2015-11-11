@@ -1,0 +1,14 @@
+Group   All
+Group   gSmallRoom      (All)
+Group   gBalcony        (All)
+
+Group   gS      "kisszoba"      <video> (gSmallRoom)
+
+
+String  SerialText      "Serial Data [%s]"      <serial> {serial="/dev/ttyACM1"}
+
+Number  SmallRoomTemp   "Homerseklet [%.1f]"
+Number  Homerseklet     "Homerseklet [%.1f C]"  <temperature>
+String  hum             "hum [%s]"
+Switch  led             "led"
+
