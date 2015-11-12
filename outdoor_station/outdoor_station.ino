@@ -6,22 +6,20 @@
 Adafruit_BMP085 bmp;
 
 
-
+//#define DHTTYPE DHT11
 #define DHTTYPE DHT22
 
 
-
 // --- board settings ---
-
-#define ver  "1.0.2"   // firmware version
-#define addr "2"       // board address
+#define ver  "1.0.2"         // firmware version
+#define addr "Balcony"       // board address
 
 // --- port settings ---
 #define RS485controlpin   4
 #define DHTPIN            5       //DHT22 
 #define ledpin            13
 int voltagePin =          A0;     //input voltage 
-int current =             A1;     //still not used
+int currentPin =          A1;     //still not used
 int lightPin =            A2;     
 
 
