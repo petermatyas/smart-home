@@ -1,3 +1,5 @@
+//indoor station
+
 #include "DHT.h"   // Adafruit library https://github.com/adafruit/DHT-sensor-library  version 1.2.3
 #include <Wire.h>
 
@@ -5,8 +7,8 @@
 #define DHTTYPE DHT22
 
 // --- board settings ---
-#define ver  "1.0.3"           // firmware version
-#define addr "SmallRoom:"      // board address
+#define ver  "1.0.5"           // firmware version
+#define addr "SmallRoom"       // board address
 
 
 // --- port settings ---
@@ -21,13 +23,18 @@ int lightPin =            A2;
 
 DHT dht(DHTPIN, DHTTYPE); 
 
+;
 
 
 // --- settings ---
 
 int  wateringDelay = 2000;
 float t,h;
-unsigned long previousMillis,currentMillis;
+unsigned long currentMillis = millis(),previousMillis;
+String command,segedstr;
+static char outstr[15];
+
+
 
 void watering(int t) {
   Serial.println("in wateing");
@@ -43,25 +50,9 @@ int Light() {
 
 float dhtth() {
   currentMillis = millis();
-  if (currentMillis - previousMillis > 2000) {
-    for (int i = 0; i < 3; i++) {
+  if (currentMillis - previousMillis > 3000) {
       t = dht.readTemperature();
-      if (isnan(t)) {
-        delay(2000);
-        }
-        else {
-          break;
-        }
-      }  
-    for (int i = 0; i < 3; i++) {
       h = dht.readHumidity();
-      if (isnan(h)) {
-        delay(2000);
-        }
-        else {
-          break;
-        }
-      }  
       previousMillis = currentMillis;
     }
   
@@ -77,9 +68,21 @@ float Humidity() {
   return(h);
 }
 
+void RS485write(String s1, String s2) {
+  digitalWrite(RS485controlpin, HIGH);
+  delay(100);
+  Serial1.print(addr);
+  Serial1.print(":");
+  Serial1.print(s1);
+  Serial1.print(":");  
+  Serial1.println(s2);
+  digitalWrite(RS485controlpin, LOW);
+}
+
+
 
 void setup() {
-  Serial.begin(9600);
+  Serial1.begin(9600);
   pinMode(RS485controlpin, OUTPUT);
   digitalWrite(RS485controlpin, LOW);
   pinMode(wateringPin, OUTPUT);      
@@ -89,17 +92,16 @@ void setup() {
   dht.begin();
   
   previousMillis = millis();
+  t = dht.readTemperature();
+  h = dht.readHumidity();
 }
 
 //----------main loop------------//
 
 void loop() {
-  unsigned long currentMillis = millis();
-  String command,segedstr;
-  static char outstr[15];
 
-  if(Serial.available()){
-    command = Serial.readStringUntil('\n');
+  if(Serial1.available()){
+    command = Serial1.readStringUntil('\n');
 
     if(command.substring(0,sizeof("watering")-1)=="watering"){
       segedstr = command.substring(sizeof("watering"));
@@ -108,15 +110,16 @@ void loop() {
 
     if(command=="getSmallRoomTemp") {
       dtostrf(Temperature(),3,1,outstr);
-      segedstr = "SmallRoom:Temp:";
-      segedstr += outstr;
-      Serial.println(segedstr);
+      RS485write("Temp", outstr);
     } 
     else if(command=="getSmallRoomHum") {
+      //dtostrf(Humidity(),3,1,outstr);
+      //segedstr = addr;
+      //segedstr += ":Hum:";
+      //segedstr += outstr;
+      //RS485write(segedstr);       
       dtostrf(Humidity(),3,1,outstr);
-      segedstr = "SmallRoom:Temp:";
-      segedstr += outstr;
-      Serial.println(segedstr);         
+      RS485write("Hum", outstr)     
     }
     else if(command=="light") {
       Serial.print(addr);
@@ -135,8 +138,10 @@ void loop() {
       digitalWrite(ledPin, LOW);     
     }     
     else if(command=="statue") {
-      Serial.println("ok");     
+      RS485write("ok");     
     }     
+      
+    
     
     command = "";    
   }

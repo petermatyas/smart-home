@@ -11,13 +11,13 @@ Adafruit_BMP085 bmp;
 
 
 // --- board settings ---
-#define ver  "1.0.2"         // firmware version
+#define ver  "1.0.5"         // firmware version
 #define addr "Balcony"       // board address
 
 // --- port settings ---
 #define RS485controlpin   4
 #define DHTPIN            5       //DHT22 
-#define ledpin            13
+#define ledPin            13
 int voltagePin =          A0;     //input voltage 
 int currentPin =          A1;     //still not used
 int lightPin =            A2;     
@@ -37,18 +37,8 @@ int Light() {
 
 
 float Temperature() {
-  delay(2000);
-  for (int i = 0; i<3;i++) {
-    float t = dht.readTemperature();      
-    if (isnan(t)) {
-      delay(2000);    
-    }
-    else {
-      return(t);
-      break;
-    }
-  } 
-  return('err');
+  float t = dht.readTemperature();      
+  return(t);
 }
 
 
@@ -75,11 +65,27 @@ int Voltage() {
   return(analogRead(voltagePin));
 }
 
+void RS485write(String s, float p) {
+  digitalWrite(RS485controlpin, HIGH);
+  delay(100);
+  Serial1.print("Balcony");
+  Serial1.print(":");
+  Serial1.print(s);
+  Serial1.print(":");  
+  Serial1.println(p);
+  delay(100);
+  digitalWrite(RS485controlpin, LOW);
+}
+
+
+
 // --- setup ---
 void setup() {
   Serial1.begin(9600);
   pinMode(RS485controlpin, OUTPUT);
   digitalWrite(RS485controlpin, LOW);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
   dht.begin();
   bmp.begin();
 
@@ -90,46 +96,36 @@ void setup() {
 void loop() {
 
   if(Serial1.available()) {
-    String address = Serial1.readStringUntil('@');
-    if (address==addr) {
-    
-      command = Serial1.readStringUntil('\n');
+    String command = Serial1.readStringUntil('\n');   
 
-      if(command=="temp") {
-        digitalWrite(RS485controlpin, HIGH);
-        Serial1.println(Temperature());   
-        digitalWrite(RS485controlpin, LOW);
-      } 
-      else if(command=="hum") {
-        digitalWrite(RS485controlpin, HIGH);
-        Serial1.println(Humidity());  
-        digitalWrite(RS485controlpin, LOW);        
-      }
-      else if(command=="light") {
-        digitalWrite(RS485controlpin, HIGH);
-        Serial1.println(Light());
-        digitalWrite(RS485controlpin, LOW);
-      }
-      else if (command=="pres") {
-        digitalWrite(RS485controlpin, HIGH);
-        Serial1.println(Pressure());
-        digitalWrite(RS485controlpin, LOW);
-      }
-      else if (command=="volt") {
-        digitalWrite(RS485controlpin, HIGH);
-        Serial1.println(Voltage());
-        digitalWrite(RS485controlpin, LOW);
-      }
-      else if (command=="ledon") {
-        digitalWrite(ledpin, HIGH);
-      }
-      else if (command=="ledoff") {
-        digitalWrite(ledpin, LOW);
-      }     
+
+    if(command=="temp") {
+      RS485write("Temp", Temperature());
+    } 
+    else if(command=="hum") {
+      RS485write("Hum", Humidity());      
     }
+    else if(command=="light") {
+
+    }
+    else if (command=="pres") {
+      RS485write("Pres", Pressure());
+    }
+    else if (command=="volt") {
+
+    }
+    else if (command=="ledon") {
+      digitalWrite(ledPin, HIGH);
+    }
+    else if (command=="ledoff") {
+      digitalWrite(ledPin, LOW);
+    }     
+
 
     command = "";    
   }
 
 
 }
+
+
