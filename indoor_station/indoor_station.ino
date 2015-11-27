@@ -119,7 +119,7 @@ void loop() {
       //segedstr += outstr;
       //RS485write(segedstr);       
       dtostrf(Humidity(),3,1,outstr);
-      RS485write("Hum", outstr)     
+      RS485write("Hum", outstr);     
     }
     else if(command=="light") {
       Serial.print(addr);
@@ -138,7 +138,7 @@ void loop() {
       digitalWrite(ledPin, LOW);     
     }     
     else if(command=="statue") {
-      RS485write("ok");     
+      RS485write("","ok");     
     }     
       
     

@@ -6,12 +6,34 @@
 Adafruit_BMP085 bmp;
 
 
+#define NodeId 1
+#define ChildSensorId 5
+
+//message type
+#define presentation 0
+#define set 1
+#define req 2
+#define internal 3
+
+//presentation
+#define S_TEMP 6
+#define S_HUM 7
+#define S_BARO 8
+
+//set req
+#define V_TEMP 0
+#define V_HUM 1
+#define V_PRESSURE 4
+
+
+
+
 //#define DHTTYPE DHT11
 #define DHTTYPE DHT22
 
 
 // --- board settings ---
-#define ver  "1.0.5"         // firmware version
+#define ver  "1.0.6"         // firmware version
 #define addr "Balcony"       // board address
 
 // --- port settings ---
@@ -65,17 +87,33 @@ int Voltage() {
   return(analogRead(voltagePin));
 }
 
-void RS485write(String s, float p) {
+void RS485write(int MessageType, int Ack, int SubType, float PayLoad) {
   digitalWrite(RS485controlpin, HIGH);
   delay(100);
-  Serial1.print("Balcony");
-  Serial1.print(":");
-  Serial1.print(s);
-  Serial1.print(":");  
-  Serial1.println(p);
+  Serial1.print(NodeId);
+  Serial1.print(";");
+  Serial1.print(ChildSensorId);
+  Serial1.print(";");  
+  Serial1.print(MessageType);
+  Serial1.print(";");
+  Serial1.print(Ack);
+  Serial1.print(";");  
+  Serial1.print(SubType);
+  Serial1.print(";");  
+  Serial1.println(PayLoad);    
   delay(100);
   digitalWrite(RS485controlpin, LOW);
 }
+
+void SendPresentation() {
+  RS485write(presentation,0,S_TEMP,0);
+  RS485write(presentation,0,S_HUM,0);     
+
+
+
+
+}
+
 
 
 
@@ -100,19 +138,19 @@ void loop() {
 
 
     if(command=="temp") {
-      RS485write("Temp", Temperature());
+      RS485write(set,0,S_TEMP,Temperature());
     } 
     else if(command=="hum") {
-      RS485write("Hum", Humidity());      
+      //RS485write("Hum", Humidity());      
     }
     else if(command=="light") {
 
     }
     else if (command=="pres") {
-      RS485write("Pres", Pressure());
+      //RS485write("Pres", Pressure());
     }
     else if (command=="volt") {
-
+      //RS485write("Volt", Voltage());
     }
     else if (command=="ledon") {
       digitalWrite(ledPin, HIGH);
@@ -124,7 +162,6 @@ void loop() {
 
     command = "";    
   }
-
 
 }
 
