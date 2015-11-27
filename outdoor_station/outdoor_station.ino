@@ -33,7 +33,7 @@ Adafruit_BMP085 bmp;
 
 
 // --- board settings ---
-#define ver  "1.0.6"         // firmware version
+#define ver  "1.0.7"         // firmware version
 #define addr "Balcony"       // board address
 
 // --- port settings ---
@@ -108,10 +108,6 @@ void RS485write(int MessageType, int Ack, int SubType, float PayLoad) {
 void SendPresentation() {
   RS485write(presentation,0,S_TEMP,0);
   RS485write(presentation,0,S_HUM,0);     
-
-
-
-
 }
 
 
@@ -135,6 +131,17 @@ void loop() {
 
   if(Serial1.available()) {
     String command = Serial1.readStringUntil('\n');   
+    
+    String cmdarray[6];
+
+    char *tmp;
+    int i = 0;
+    tmp = strtok(&command[0], ";");
+    while (tmp) {
+      cmdarray[i++] = tmp;
+      tmp = strtok(NULL, ",");
+    }
+
 
 
     if(command=="temp") {
@@ -164,5 +171,7 @@ void loop() {
   }
 
 }
+
+
 
 
