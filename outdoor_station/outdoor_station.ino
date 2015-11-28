@@ -6,8 +6,8 @@
 Adafruit_BMP085 bmp;
 
 
-#define NodeId 1
-#define ChildSensorId 5
+#define ownNodeId 1
+#define ownChildSensorId 5
 
 //message type
 #define presentation 0
@@ -87,20 +87,20 @@ int Voltage() {
   return(analogRead(voltagePin));
 }
 
-void RS485write(int MessageType, int Ack, int SubType, float PayLoad) {
+void RS485write(int gMessageType, int gAck, int gSubType, float gPayLoad) {
   digitalWrite(RS485controlpin, HIGH);
   delay(100);
-  Serial1.print(NodeId);
+  Serial1.print(ownNodeId);
   Serial1.print(";");
-  Serial1.print(ChildSensorId);
+  Serial1.print(ownChildSensorId);
   Serial1.print(";");  
-  Serial1.print(MessageType);
+  Serial1.print(gMessageType);
   Serial1.print(";");
-  Serial1.print(Ack);
+  Serial1.print(gAck);
   Serial1.print(";");  
-  Serial1.print(SubType);
+  Serial1.print(gSubType);
   Serial1.print(";");  
-  Serial1.println(PayLoad);    
+  Serial1.println(gPayLoad);    
   delay(100);
   digitalWrite(RS485controlpin, LOW);
 }
@@ -115,6 +115,7 @@ void SendPresentation() {
 
 // --- setup ---
 void setup() {
+  Serial.begin(9600);
   Serial1.begin(9600);
   pinMode(RS485controlpin, OUTPUT);
   digitalWrite(RS485controlpin, LOW);
@@ -129,20 +130,26 @@ void setup() {
 
 void loop() {
 
+  String cmdarray[6],PayLoad;
+  char *tmp;
+  int i = 0,NodeId,ChildSensorId,MessageType,Ack,SubType;
+
+
   if(Serial1.available()) {
     String command = Serial1.readStringUntil('\n');   
-    
-    String cmdarray[6];
-
-    char *tmp;
-    int i = 0;
     tmp = strtok(&command[0], ";");
-    while (tmp) {
+    while (tmp) {     
       cmdarray[i++] = tmp;
-      tmp = strtok(NULL, ",");
+      tmp = strtok(NULL, ";");
     }
+    
+    NodeId = cmdarray[0].toInt();
+    ChildSensorId = cmdarray[1].toInt();
+    MessageType = cmdarray[2].toInt();
+    Ack = cmdarray[3].toInt();
+    SubType = cmdarray[4].toInt();
 
-
+  
 
     if(command=="temp") {
       RS485write(set,0,S_TEMP,Temperature());
@@ -171,6 +178,8 @@ void loop() {
   }
 
 }
+
+
 
 
 
